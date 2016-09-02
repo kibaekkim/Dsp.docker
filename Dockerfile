@@ -15,17 +15,6 @@ RUN apt-get install -y autoconf
 RUN apt-get install -y automake
 RUN apt-get install -y libbz2-dev
 RUN apt-get install -y zlib1g-dev
-RUN apt-get install -y xutils-dev
-
-# Install python 
-RUN apt-get install -y python
-RUN apt-get install -y libpython-dev
-RUN apt-get install -y python-pip
-
-# for Python interface
-RUN pip install --upgrade pip
-RUN pip install mpi4py
-RUN apt-get install -y swig
 
 # Install Julia
 RUN apt-get install -y software-properties-common
@@ -36,5 +25,8 @@ RUN apt-get install -y julia
 # Julia packages
 RUN julia -e 'Pkg.add("MathProgBase")'
 RUN julia -e 'Pkg.add("JuMP")'
+RUN julia -e 'Pkg.add("MPI")'
+RUN julia -e 'Pkg.clone("http://github.com/kibaekkim/Dsp.jl")'
+RUN julia -e 'Pkg.checkout("Dsp")'
 RUN julia -e 'Pkg.update()'
 RUN julia -e 'using JuMP'
