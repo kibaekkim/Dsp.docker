@@ -1,32 +1,27 @@
-FROM ubuntu
+FROM centos:7
 
 MAINTAINER Kibaek Kim "kimk@anl.gov"
 
-RUN apt-get update
+RUN yum -y update
+RUN yum -y install git gcc gcc-c++ gcc-gfortran kernel-devel
+RUN yum -y install cmake blas-devel lapack-devel subversion make autoconf automake bzip2-devel zlib-devel
 
-# Prerequisites for DSP
-RUN apt-get install -y libmpich-dev
-RUN apt-get install -y cmake
-RUN apt-get install -y libblas-dev
-RUN apt-get install -y liblapack-dev
-RUN apt-get install -y subversion
-RUN apt-get install -y build-essential
-RUN apt-get install -y autoconf
-RUN apt-get install -y automake
-RUN apt-get install -y libbz2-dev
-RUN apt-get install -y zlib1g-dev
+# Install MPI
+RUN yum -y install mpich
+RUN yum -y install mpich-devel
+RUN yum -y install mpich-autoload
 
 # Install Julia
-RUN apt-get install -y software-properties-common
-RUN add-apt-repository ppa:staticfloat/juliareleases
-RUN add-apt-repository ppa:staticfloat/julia-deps
-RUN apt-get install -y julia
+RUN yum -y install wget
+RUN wget https://copr.fedorainfracloud.org/coprs/nalimilan/julia/repo/epel-7/nalimilan-julia-epel-7.repo
+RUN mv nalimilan-julia-epel-7.repo /etc/yum.repos.d/
+RUN yum -y install epel-release
+RUN yum -y install julia
 
 # Julia packages
 RUN julia -e 'Pkg.add("MathProgBase")'
 RUN julia -e 'Pkg.add("JuMP")'
-RUN julia -e 'Pkg.add("MPI")'
+RUN source /etc/profile.d/modules.sh; module load mpi; julia -e 'Pkg.add("MPI")'
 RUN julia -e 'Pkg.clone("http://github.com/kibaekkim/Dsp.jl")'
-RUN julia -e 'Pkg.checkout("Dsp")'
 RUN julia -e 'Pkg.update()'
-RUN julia -e 'using JuMP'
+RUN julia -e 'using JuMP, MPI'
