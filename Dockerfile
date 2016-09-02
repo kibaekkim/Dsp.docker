@@ -1,25 +1,26 @@
-FROM opensuse
+FROM ubuntu
 
 MAINTAINER Kibaek Kim "kimk@anl.gov"
 
-RUN zypper update -y
-RUN zypper install --no-recommends -y gcc gcc-c++ gcc-fortran git
-RUN zypper install --no-recommends -y cmake blas-devel lapack-devel subversion make autoconf automake libbz2-devel zlib-devel
+RUN apt-get update
 
-# MPI
-RUN zypper install --no-recommends -y openmpi openmpi-devel openmpi-libs
-ENV PATH=$PATH:/usr/lib64/mpi/gcc/openmpi/bin
-ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64/mpi/gcc/openmpi/lib64
-
+# Prerequisites for DSP
+RUN apt-get install -y libopenmpi-dev
+RUN apt-get install -y cmake
+RUN apt-get install -y libblas-dev
+RUN apt-get install -y liblapack-dev
+RUN apt-get install -y subversion
+RUN apt-get install -y build-essential
+RUN apt-get install -y autoconf
+RUN apt-get install -y automake
+RUN apt-get install -y libbz2-dev
+RUN apt-get install -y zlib1g-dev
 
 # Install Julia
-RUN zypper install --no-recommends -y julia
-
-# Additional library and settings For Julia
-RUN zypper install -y libopenlibm1
-RUN zypper install --no-recommends -y libcholmod-3_0_6
-RUN ln -s /usr/lib64/libcholmod-3.0.6.so /usr/lib64/libcholmod.so
-RUN ln -s /usr/lib64/libsuitesparseconfig-4.4.5.so /usr/lib64/libsuitesparseconfig.so
+RUN apt-get install -y software-properties-common
+RUN add-apt-repository ppa:staticfloat/juliareleases
+RUN add-apt-repository ppa:staticfloat/julia-deps
+RUN apt-get install -y julia
 
 # Julia packages
 RUN julia -e 'Pkg.add("MathProgBase")'
